@@ -2,12 +2,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: Vinayak K P
+// Engineer: VINAYAK K P
 //
-// Create Date:   13/12/2022
+// Create Date:   19:06:20 10/29/2022
 // Design Name:   apb_slave
-// Module Name:   apb_tb
-// Project Name:  apb_i2c_bridge
+// Module Name:   
+// Project Name:  apb
 // Target Device:  
 // Tool versions:  
 // Description: 
@@ -35,7 +35,6 @@ module apb_tb;
 	reg [31:0] Dout;
 	reg ready;
 	reg [7:0] i2c_stat;
-	//reg slverr;
 
 	// Outputs
 	wire [7:0] i2c_con1;
@@ -57,7 +56,6 @@ module apb_tb;
 		.Dout(Dout), 
 		.ready(ready), 
 		.i2c_stat(i2c_stat), 
-		//.slverr(slverr), 
 		.i2c_con1(i2c_con1), 
 		.i2c_con2(i2c_con2), 
 		.PRDATA(PRDATA), 
@@ -66,9 +64,9 @@ module apb_tb;
 		.PSLVERR(PSLVERR)
 	);
 	
-	localparam T = 33.3333;
+	localparam T = 10;
 	
-	always #(T/2) PCLK = ~PCLK;
+	always #(T/2) PCLK <= ~PCLK;
 	
 	initial begin
 		// Initialize Inputs
@@ -78,16 +76,15 @@ module apb_tb;
 		PENABLE = 0;
 		PWrite = 1;
 		PADDR = 32'h0000_0000;
-						//con2         con1 
-					  //r/w  addr 0-6 ff R D/A cc e r
-		PWDATA = 32'b0___1100_011__00_0_1___11_1_1;
+						//con2            con1 
+					  //addr 0-6 r/w ff R D/A cc e r
+		PWDATA = 32'b1100_011__0__00_0_1___11_1_1;
 		Dout = 0;
 		ready = 1;
 		i2c_stat = 8'b0000_0000;
-		//slverr = 0;
 
 		// Wait 100 ns for global reset to finish
-		#T
+		#100
 		PRESETn = 1;
 		#T
 		PSEL = 1;
@@ -95,16 +92,28 @@ module apb_tb;
 		PENABLE = 1;
 		#T
 		PENABLE = 0;
+		
+		#(T/2)
 		PADDR = 32'hff00_0000;
 		PWDATA = 32'hf03b_0000;
-		#T
+		#(T/2)
 		PENABLE = 1;
 		#T
 		PRESETn = 0;
 		PSEL = 0;
 		PENABLE = 0;
 		
-		// Add stimulus here
+		#T
+		PRESETn = 1;
+		PADDR = 32'hff00_0000;
+		PWDATA = 32'hbb2e_0ff0;
+		ready = 0;
+		#T
+		PSEL = 1;
+		#T
+		PENABLE = 1;
+		#T
+		PENABLE = 0;
 
 	end
       
