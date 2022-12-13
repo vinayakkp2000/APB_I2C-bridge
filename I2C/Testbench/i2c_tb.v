@@ -2,11 +2,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer:
+// Engineer: VINAYAK K P
 //
 // Create Date:   10:46:18 10/29/2022
 // Design Name:   i2c
-// Module Name:   G:/I2C -1/IC/i2c_tb.v
+// Module Name:   
 // Project Name:  IC
 // Target Device:  
 // Tool versions:  
@@ -25,7 +25,7 @@
 module i2c_tb;
 
 	// Inputs
-	reg CLK;
+	reg PCLK;
 	reg [7:0] i2c_con1;
 	reg [7:0] i2c_con2;
 	reg [31:0] Din;
@@ -33,6 +33,7 @@ module i2c_tb;
 	// Outputs
 	wire [31:0] Dout;
 	wire [7:0] i2c_stat;
+	wire ready;
 
 	// Bidirs
 	wire i2c_sda;
@@ -41,35 +42,37 @@ module i2c_tb;
 
 	// Instantiate the Unit Under Test (UUT)
 	i2c_bridge uut (
-		.CLK(CLK), 
+		.PCLK(PCLK), 
 		.i2c_con1(i2c_con1), 
 		.i2c_con2(i2c_con2), 
 		.Din(Din), 
 		.Dout(Dout), 
 		.i2c_stat(i2c_stat), 
+		.ready(ready),
 		.i2c_scl(i2c_scl), 
 		.i2c_sda(i2c_sda)
 	);
 
-	always #5 CLK = ~CLK;
+	always #5 PCLK <= ~PCLK;
+	
+	pullup(i2c_sda);
+	pullup(i2c_scl);
 
 	initial begin
 		// Initialize Inputs
-		CLK = 1;
+		PCLK = 1;
 		i2c_con1 = 0;
 		i2c_con2 = 0;
 		Din = 0;
 
-		// Wait 100 ns for global reset to finish
 		#40;
 		//            ff R D/A cc e r
-		i2c_con1 = 8'b11_0__1__11_1_1;
+		i2c_con1 = 8'b11_1__0__11_1_1;
 		
-		//           r/w  addr 0-6
-		i2c_con2 = 8'b1__1100101;
+		//            addr 0-6 r/w
+		i2c_con2 = 8'b1100101__1;
 		Din = 32'hfeab;
         
-		// Add stimulus here
 
 	end
       
