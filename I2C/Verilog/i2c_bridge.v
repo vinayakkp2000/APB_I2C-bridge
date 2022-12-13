@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: 
+// Engineer: VINAYAK K P
 // 
 // Create Date:    11:22:32 10/28/2022 
 // Design Name: 
@@ -19,7 +19,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module i2c_bridge (
-	input wire CLK, // 100 MHz FPGA CLK
+	input wire PCLK, 
 	input wire [7:0] i2c_con1,
 	input wire [7:0] i2c_con2,
 	input wire [31:0] Din,
@@ -41,7 +41,7 @@ module i2c_bridge (
 	 
 	 reg clk = 1;
 	 reg [7:0] ccount = 0;
-	 reg [10:0] DIV;
+	 reg [10:0] DIV = 0;
 	 
 	 wire [1:0] iscount;
 	 wire [3:0] istate;
@@ -59,11 +59,10 @@ module i2c_bridge (
 	 assign DA = i2c_con1[4];
 	 assign rep =i2c_con1[5];
 	 
-	 assign addr = i2c_con2[6:0];
-	 assign rw = i2c_con2[7];
+	 assign addr = i2c_con2[7:1];
+	 assign rw = i2c_con2[0];
 	 
-	 always @(posedge CLK) begin
-		//i2c_stat[0] <= 1'b1;
+	 always @(posedge PCLK) begin
 		i2c_stat[1] <= rw;
 		i2c_stat[3:2] <= iscount;
 		case(istate)
@@ -87,21 +86,21 @@ module i2c_bridge (
 	
 	always @(*) begin
 		case(i2c_con1[7:6])
-			2'b00:DIV = f100;
-			2'b01:DIV = f400;
-			2'b10:DIV = f1mhz;
-			2'b11:DIV = f3mhz;
-			default:DIV = f100;
+			2'b00:DIV <= f100;
+			2'b01:DIV <= f400;
+			2'b10:DIV <= f1mhz;
+			2'b11:DIV <= f3mhz;
+			default:DIV <= f100;
 		endcase
 	end
 	
-	always @(posedge CLK) begin
+	always @(posedge PCLK) begin
 		if (ccount < DIV) begin
-			ccount = ccount + 1'b1;
+			ccount <= ccount + 1'b1;
 		end
 		else begin
-			clk = ~clk ;
-			ccount = 8'b0;
+			clk <= ~clk ;
+			ccount <= 8'b0;
 		end
 	end
 
