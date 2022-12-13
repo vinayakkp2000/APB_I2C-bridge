@@ -2,12 +2,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer:
+// Engineer: Vinayak K P
 //
-// Create Date:   19:06:20 10/29/2022
+// Create Date:   13/12/2022
 // Design Name:   apb_slave
-// Module Name:   G:/APB_I2C/apb/a.v
-// Project Name:  apb
+// Module Name:   apb_tb
+// Project Name:  apb_i2c_bridge
 // Target Device:  
 // Tool versions:  
 // Description: 
