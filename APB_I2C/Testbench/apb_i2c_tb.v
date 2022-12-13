@@ -2,11 +2,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer:
+// Engineer: VINAYAK K P
 //
 // Create Date:   11:27:53 10/31/2022
 // Design Name:   i2c_ic
-// Module Name:   G:/APB_I2C/apb/top_tb.v
+// Module Name:   
 // Project Name:  apb
 // Target Device:  
 // Tool versions:  
@@ -26,7 +26,6 @@ module apb_i2c_tb;
 
 	// Inputs
 	reg PCLK;
-	reg CLK;
 	reg PRESETn;
 	reg PSEL;
 	reg PENABLE;
@@ -45,8 +44,7 @@ module apb_i2c_tb;
 
 	// Instantiate the Unit Under Test (UUT)
 	apb_i2c_ic uut (
-		.PCLK(PCLK), 
-		.CLK(CLK), 
+		.PCLK(PCLK),  
 		.PRESETn(PRESETn), 
 		.PSEL(PSEL), 
 		.PENABLE(PENABLE), 
@@ -60,28 +58,24 @@ module apb_i2c_tb;
 		.i2c_sda(i2c_sda)
 	);
 	
-	localparam T = 33.3333;
+	localparam T = 10;
 	
-	always #(T/2) PCLK = ~PCLK;
-	always #5 CLK = ~CLK;
+	always #(T/2) PCLK <= ~PCLK;
+	
+	pullup(i2c_sda);
+	pullup(i2c_scl);
 	
 	initial begin
 		// Initialize Inputs
 		PCLK = 1;
-		CLK = 1;
 		PRESETn = 0;
 		PSEL = 0;
 		PENABLE = 0;
 		
-		
-		/////////////////////////////////////////////
-		//write-32
-		
-		PWrite = 1;
+////////////////// status read ////////////		
+		PWrite = 0;
 		PADDR = 32'h0000_0000;
-						         //con2          con1 
-					           // r/w  addr 0-6  ff R D/A cc e r
-		PWDATA = 32'b0000_0000__0___1100_011__10_0__1__11_1_1;
+	   PWDATA = 32'h0000_0000;
 		
 		#T
 		PRESETn = 1;
@@ -91,22 +85,41 @@ module apb_i2c_tb;
 		PENABLE = 1;
 		#T
 		PENABLE = 0;
-		PADDR = 32'hff00_0000;
-		PWDATA = 32'hf23b_1a85;
-		#T
-		PENABLE = 1;
-		#T
-		PRESETn = 0;
-		PSEL = 0;
-		PENABLE = 0;
 		
-//		///////////////////////////////////////
-//		//read-32 bit
+//////uncomment from here for i2c_write 
+		
+/////////////////// config write for i2c_write/////////////
+//		#(T/2)
 //		PWrite = 1;
+//		PADDR = 32'h0000_0000;		
+//						          //con2        con1 
+//					            //addr 0-6 R/W ff R D/A cc e r
+//		PWDATA = 32'b0000_0000_1100_011__0__11_0__1__00_1_1;
+//		
+//		#(T/2)
+//		PENABLE = 1;
+//		#T
+//		PENABLE = 0;
+//		
+///////////////////// data write/////////////
+//		#(T/2)
+//		PWrite = 1;
+//		PADDR = 32'hffff_0000;		
+//		PWDATA = 32'h1234_abcd;
+//		
+//		#(T/2)
+//		PENABLE = 1;
+//		#T
+//		PRESETn = 0;
+//		PSEL = 0;
+//		PENABLE = 0;
+//		
+//		
+//////////////////// status read for i2c write completion////////////
+//		#(630*T)
+//		PWrite = 0;
 //		PADDR = 32'h0000_0000;
-//						         //con2          con1 
-//					           // r/w  addr 0-6  ff R D/A cc e r
-//		PWDATA = 32'b0000_0000__1___1100_011__10_0__1__11_1_1;
+//	   PWDATA = 32'h0000_0000;
 //		
 //		#T
 //		PRESETn = 1;
@@ -116,29 +129,40 @@ module apb_i2c_tb;
 //		PENABLE = 1;
 //		#T
 //		PENABLE = 0;
-//		PRESETn = 0;
 //		PSEL = 0;
-//		PENABLE = 0;
-//		PWrite = 0;
-//		PADDR = 32'hff00_0000;
-//		//PWDATA = 32'hf23b_1a85;
-//		#(1430*T)
-//		PRESETn = 1;
-//		#T
-//		PSEL = 1;
-//		#T
-//		PENABLE = 1;
-//		#T
 //		PRESETn = 0;
-//		PSEL = 0;
-//		PENABLE = 0;
-        
+
+///////uncomment till here for i2c_write
+
+
+
+
+///////uncomment from here for i2c_read 		
+///////////////// config write for i2c_read/////////////
+		#(T/2)
+		PWrite = 1;
+		PADDR = 32'h0000_0000;		
+						          //con2        con1 
+					            //addr 0-6 R/W ff R D/A cc e r
+		PWDATA = 32'b0000_0000_1100_011__1__11_0__1__00_1_1;
 		
-		////////////////////////////////////////////////////
-		//status read
-						            //con2         con1 
-					              //r/w  addr 0-6 ff R D/A cc e r
-		//PWDATA = 32'b0000_0000_0___1100_011__11_0_1___11_1_1;
+		#(T/2)
+		PENABLE = 1;
+		#T
+		PENABLE = 0;
+		PSEL = 0;
+		PRESETn = 0;
+			
+
+	
+
+///////////////// data read (after some wait time)/////////////
+
+		/////status read for checking completion of i2c read cycle//////
+		#(640*T)
+		PWrite = 0;
+		PADDR = 32'h0000_0000;
+	   PWDATA = 32'h0000_0000;
 		
 		#T
 		PRESETn = 1;
@@ -148,16 +172,23 @@ module apb_i2c_tb;
 		PENABLE = 1;
 		#T
 		PENABLE = 0;
-		//PADDR = 32'hff00_0000;
-		//PWDATA = 32'hf03b_0000;
-		#T
+		
+		/////actual data read////////////
+		#(T/2)
+		PWrite = 1;
+		PADDR = 32'hffff_0000;		
+		PWDATA = 32'h0000_0000;
+		
+		#(T/2)
 		PENABLE = 1;
 		#T
 		PRESETn = 0;
 		PSEL = 0;
 		PENABLE = 0;
-
+		
+///////uncomment till here for i2c_read		
+		
 	end
-      
+
 endmodule
 
