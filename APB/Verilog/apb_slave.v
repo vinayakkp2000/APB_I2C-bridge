@@ -105,35 +105,35 @@ module apb_slave(
 		case (state) 
 			IDLE: begin
 				if (PSEL) 
-					nxt_state <= SETUP;
+					nxt_state = SETUP;
 				else 
-					nxt_state <= IDLE;
+					nxt_state = IDLE;
 			end
 			SETUP: begin
 				if (PSEL) begin 
 					if (PENABLE)
-						nxt_state <= ACCESS;
+						nxt_state = ACCESS;
 					else 
-						nxt_state <= SETUP;
+						nxt_state = SETUP;
 				end
 				else 
-					nxt_state <= IDLE;
+					nxt_state = IDLE;
 			end
 			ACCESS: begin
 				if (PSEL) begin 
 					if (PENABLE)
 						if (PREADY)
-							nxt_state <= SETUP;
+							nxt_state = SETUP;
 						else 
-							nxt_state <= ACCESS;
+							nxt_state = ACCESS;
 					else 
-						nxt_state <= SETUP;
+						nxt_state = SETUP;
 				end
 				else 
-					nxt_state <= IDLE;
+					nxt_state = IDLE;
 			end
 			default: begin
-				nxt_state <= IDLE;
+				nxt_state = IDLE;
 			end
 			
 		endcase
