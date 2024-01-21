@@ -86,11 +86,11 @@ module i2c_bridge (
 	
 	always @(*) begin
 		case(i2c_con1[7:6])
-			2'b00:DIV <= f100;
-			2'b01:DIV <= f400;
-			2'b10:DIV <= f1mhz;
-			2'b11:DIV <= f3mhz;
-			default:DIV <= f100;
+			2'b00:DIV = f100;
+			2'b01:DIV = f400;
+			2'b10:DIV = f1mhz;
+			2'b11:DIV = f3mhz;
+			default:DIV = f100;
 		endcase
 	end
 	
